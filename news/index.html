@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>News | Probably Qubits</title>
+<meta name="description" content="Quantum computing news, summarized, with one line on why it matters.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='white' stroke='%231A2033' stroke-width='2.5'/%3E%3Cline x1='16' y1='16' x2='24' y2='7' stroke='%232341C7' stroke-width='3'/%3E%3Ccircle cx='24' cy='7' r='3' fill='%232341C7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL@-15..0,300..900,0..1&display=swap" rel="stylesheet">
+<style>
+/* Probably Qubits: shared styles */
+:root{
+  --paper:#F7F9FC;
+  --grid:#DCE6F2;
+  --ink:#2341C7;
+  --pencil:#4F5866;
+  --text:#1A2033;
+  --hl:#FFE15A;
+  --redpen:#E5484D;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--text);
+  font-family:"Recursive",system-ui,sans-serif;
+  font-variation-settings:"CASL" 0;
+  font-size:18px;line-height:1.6;
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.hand{font-variation-settings:"CASL" 1,"slnt" -10;font-weight:500}
+a{color:var(--ink)}
+a:focus-visible,button:focus-visible,canvas:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:-999px;top:8px;background:#fff;padding:8px 12px;border:2px solid var(--ink);z-index:10}
+.skip:focus{left:8px}
+
+/* Header */
+.site-header{display:flex;justify-content:space-between;align-items:center;padding:22px 0;gap:16px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:22px;text-decoration:none;color:var(--text);letter-spacing:-.01em}
+.logo span{color:var(--ink);font-variation-settings:"CASL" 1,"slnt" -12}
+.site-nav{display:flex;gap:22px}
+.site-nav a{text-decoration:none;color:var(--pencil);font-weight:500;padding:2px 0}
+.site-nav a:hover{color:var(--ink)}
+.site-nav a[aria-current="page"]{color:var(--text);background:linear-gradient(transparent 60%,var(--hl) 60%,var(--hl) 92%,transparent 92%)}
+
+/* Buttons */
+.btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;padding:12px 20px;border-radius:999px;border:2px solid var(--ink);background:var(--ink);color:#fff;text-decoration:none;cursor:pointer;display:inline-block}
+.btn.ghost{background:transparent;color:var(--ink)}
+
+/* Type */
+h1{font-size:clamp(40px,6vw,68px);line-height:1.02;letter-spacing:-.025em;font-weight:800;margin:0 0 22px}
+h2{font-size:clamp(30px,4vw,42px);line-height:1.1;letter-spacing:-.02em;margin:0 0 8px;font-weight:800}
+.lede{font-size:20px;color:var(--pencil);max-width:44ch;margin:0 0 28px}
+.mark{background:linear-gradient(transparent 55%,var(--hl) 55%,var(--hl) 92%,transparent 92%)}
+.sub{color:var(--pencil);margin:0 0 32px;max-width:52ch}
+section{padding:56px 0}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.more{font-weight:600;text-decoration:none}
+.more:hover{text-decoration:underline}
+
+/* Page header (inner pages) */
+.page-head{padding:40px 0 8px}
+.page-head h1{font-size:clamp(40px,5.5vw,60px)}
+
+/* Home hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center;padding:48px 0 72px}
+.hero .lede{max-width:34ch}
+
+/* Bloch sphere widget */
+.lab{position:relative;background:#fff;border:2px solid var(--text);border-radius:6px;padding:18px 18px 14px;box-shadow:6px 6px 0 var(--grid);margin:0}
+.lab canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+.lab canvas:active{cursor:grabbing}
+.readout{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--grid);padding-top:12px;margin-top:4px}
+.verdict{font-size:22px;color:var(--ink)}
+.bars{flex:1 1 160px;font-size:14px;color:var(--pencil)}
+.bar{height:8px;background:var(--grid);border-radius:4px;overflow:hidden;margin:3px 0 6px}
+.bar i{display:block;height:100%;background:var(--ink);width:50%}
+.note{position:absolute;color:var(--redpen);font-size:16px;line-height:1.2}
+.note.n1{top:-30px;right:6px;transform:rotate(2deg)}
+.controls{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.controls .btn{padding:8px 16px;font-size:15px}
+.controls .keys{font-size:13px;color:var(--pencil);margin-left:auto}
+
+/* Entries (cards) */
+.learn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.entry{background:#fff;border:2px solid var(--text);border-radius:6px;padding:20px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:10px}
+a.entry:hover{box-shadow:5px 5px 0 var(--hl)}
+.entry h3{margin:0;font-size:21px;line-height:1.25}
+.entry p{margin:0;color:var(--pencil);font-size:16px}
+.entry .hand{color:var(--ink);font-size:15px;margin-top:auto}
+.entry.soon{border-style:dashed;background:rgba(255,255,255,.6)}
+.entry.soon .hand{color:var(--pencil)}
+.doodle{height:70px;width:auto;align-self:flex-start}
+
+/* Learn index groups */
+.group{padding:28px 0}
+.group h2{font-size:28px;margin-bottom:18px}
+
+/* News */
+.news{border-top:2px solid var(--text)}
+.news article{display:grid;grid-template-columns:140px 1fr;gap:20px;padding:18px 0;border-bottom:1px solid var(--grid)}
+.news time{color:var(--pencil);font-size:15px;padding-top:3px}
+.news h3{margin:0 0 4px;font-size:20px;line-height:1.3}
+.news p{margin:0;color:var(--pencil);font-size:16px}
+.take{color:var(--ink)}
+.news .source{font-size:14px;margin-top:6px;display:inline-block}
+
+/* Work */
+.work-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.work-grid .entry{border-style:dashed}
+.work-item{display:grid;grid-template-columns:200px 1fr;gap:32px;padding:32px 0;border-top:2px solid var(--text)}
+.work-item:last-child{border-bottom:2px solid var(--text)}
+.work-item .kind{color:var(--ink);font-size:18px}
+.work-item h2{font-size:30px;margin-bottom:12px}
+.work-item p{margin:0 0 12px;max-width:62ch}
+.work-item ul{margin:0 0 12px;padding-left:20px;max-width:62ch}
+.work-item li{margin-bottom:6px}
+
+/* About */
+.about{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start}
+.portrait{width:160px;height:160px;border:2px solid var(--text);border-radius:50%;background:#fff;display:grid;place-items:center;color:var(--pencil);font-size:14px;text-align:center;overflow:hidden}
+.portrait img{width:100%;height:100%;object-fit:cover}
+.about p{max-width:60ch;margin:0 0 16px}
+.contact{display:flex;gap:22px;flex-wrap:wrap;font-weight:600}
+
+/* Article */
+.article{max-width:720px;padding:32px 0 24px}
+.article .meta{color:var(--pencil);font-size:15px;margin-bottom:28px}
+.article h1{font-size:clamp(38px,5vw,56px)}
+.article h2{font-size:28px;margin:44px 0 12px}
+.article p,.article li{font-size:19px;line-height:1.7}
+.article p{margin:0 0 18px}
+.article ul,.article ol{padding-left:22px;margin:0 0 18px}
+.article li{margin-bottom:8px}
+.article .lab{margin:28px 0}
+.margin-note{border-left:3px solid var(--redpen);padding:4px 0 4px 16px;margin:24px 0;color:var(--redpen);font-size:18px}
+.formula{font-size:22px;text-align:center;background:#fff;border:1px dashed var(--grid);padding:16px;margin:22px 0;border-radius:6px}
+.takeaways{background:#fff;border:2px solid var(--text);border-radius:6px;padding:20px 24px;margin:36px 0 12px}
+.takeaways h2{margin-top:0;font-size:24px}
+.takeaways ul{margin:0}
+.next{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0;border-top:2px solid var(--text);margin-top:32px}
+
+/* Footer */
+.site-footer{padding:40px 0 56px;color:var(--pencil);font-size:15px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--grid);margin-top:24px}
+.site-footer a{color:var(--pencil)}
+
+/* 404 */
+.lost{padding:80px 0 120px;max-width:620px}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;padding-top:24px}
+  .learn-grid,.work-grid{grid-template-columns:1fr}
+  .news article{grid-template-columns:1fr;gap:4px}
+  .about{grid-template-columns:1fr}
+  .work-item{grid-template-columns:1fr;gap:8px}
+  .site-nav{gap:16px}
+  .note.n1{display:none}
+  .controls .keys{display:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+  <header class="site-header">
+    <a class="logo" href="../">probably<span>qubits</span></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="../learn/">Learn</a><a href="./" aria-current="page">News</a><a href="../work/">Work</a><a href="../about/">About</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="page-head">
+      <h1>News, with a take</h1>
+      <p class="lede">What happened in quantum, in two sentences, plus one line on why it matters. Newest first.</p>
+    </div>
+
+    <section style="padding-top:16px">
+      <!--
+        To add a post, copy one <article> block below, paste it at the top of the list,
+        and fill in the date, headline, summary, your take and the source link.
+      -->
+      <div class="news">
+        <article>
+          <time datetime="2026-10-22">Oct 22, 2026</time>
+          <div>
+            <h3>Sample headline about an error-correction result</h3>
+            <p>Two-sentence summary goes here. <span class="take">My take: logical qubits are the number to watch, not physical ones.</span></p>
+            <a class="source" href="#">Source</a>
+          </div>
+        </article>
+        <article>
+          <time datetime="2026-10-15">Oct 15, 2026</time>
+          <div>
+            <h3>Sample headline about a new funding round</h3>
+            <p>Two-sentence summary goes here. <span class="take">My take: what the money is for tells you more than the valuation.</span></p>
+            <a class="source" href="#">Source</a>
+          </div>
+        </article>
+        <article>
+          <time datetime="2026-10-08">Oct 8, 2026</time>
+          <div>
+            <h3>Sample headline about a hardware roadmap</h3>
+            <p>Two-sentence summary goes here. <span class="take">My take: roadmaps slip, so compare against the last one.</span></p>
+            <a class="source" href="#">Source</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>© 2026 Probably Qubits</span>
+    <span class="hand">Measured, probably.</span>
+  </footer>
+</div>
+</body>
+</html>
